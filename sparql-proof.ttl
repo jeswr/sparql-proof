@@ -1,0 +1,116 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sp: <http://www.w3.org/2005/sparql-results#> .
+@prefix : <#> .
+
+# Ontology metadata
+: a owl:Ontology ;
+    rdfs:label "SPARQL Proof Ontology" ;
+    rdfs:comment "An ontology for describing proofs of SPARQL query results" ;
+    owl:versionInfo "1.0" .
+
+# Classes
+:Proof a owl:Class ;
+    rdfs:label "Proof" ;
+    rdfs:comment "A proof of a SPARQL query result" .
+
+:ProofStep a owl:Class ;
+    rdfs:label "Proof Step" ;
+    rdfs:comment "A single step in a proof" .
+
+:Query a owl:Class ;
+    rdfs:label "Query" ;
+    rdfs:comment "A SPARQL query" .
+
+:ResultSet a owl:Class ;
+    rdfs:label "Result Set" ;
+    rdfs:comment "A set of query results" .
+
+:Result a owl:Class ;
+    rdfs:label "Result" ;
+    rdfs:comment "A single query result" .
+
+:Binding a owl:Class ;
+    rdfs:label "Binding" ;
+    rdfs:comment "A variable binding in a result" .
+
+# Properties
+:hasQuery a owl:ObjectProperty ;
+    rdfs:label "has query" ;
+    rdfs:domain :Proof ;
+    rdfs:range :Query ;
+    rdfs:comment "Links a proof to the query it proves" .
+
+:hasResultSet a owl:ObjectProperty ;
+    rdfs:label "has result set" ;
+    rdfs:domain :Proof ;
+    rdfs:range :ResultSet ;
+    rdfs:comment "Links a proof to the result set it proves" .
+
+:hasStep a owl:ObjectProperty ;
+    rdfs:label "has step" ;
+    rdfs:domain :Proof ;
+    rdfs:range :ProofStep ;
+    rdfs:comment "Links a proof to its proof steps" .
+
+:hasNextStep a owl:ObjectProperty ;
+    rdfs:label "has next step" ;
+    rdfs:domain :ProofStep ;
+    rdfs:range :ProofStep ;
+    rdfs:comment "Links a proof step to the next step in the proof" .
+
+:hasResult a owl:ObjectProperty ;
+    rdfs:label "has result" ;
+    rdfs:domain :ResultSet ;
+    rdfs:range :Result ;
+    rdfs:comment "Links a result set to its results" .
+
+:hasBinding a owl:ObjectProperty ;
+    rdfs:label "has binding" ;
+    rdfs:domain :Result ;
+    rdfs:range :Binding ;
+    rdfs:comment "Links a result to its variable bindings" .
+
+:hasVariable a owl:DatatypeProperty ;
+    rdfs:label "has variable" ;
+    rdfs:domain :Binding ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The name of the variable in a binding" .
+
+:hasValue a owl:DatatypeProperty ;
+    rdfs:label "has value" ;
+    rdfs:domain :Binding ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The value of the variable in a binding" .
+
+:hasDatatype a owl:DatatypeProperty ;
+    rdfs:label "has datatype" ;
+    rdfs:domain :Binding ;
+    rdfs:range xsd:anyURI ;
+    rdfs:comment "The datatype of the value in a binding" .
+
+:hasQueryString a owl:DatatypeProperty ;
+    rdfs:label "has query string" ;
+    rdfs:domain :Query ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The SPARQL query string" .
+
+:hasStepType a owl:DatatypeProperty ;
+    rdfs:label "has step type" ;
+    rdfs:domain :ProofStep ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The type of proof step (e.g. 'bind', 'filter', 'join')" .
+
+:hasStepDescription a owl:DatatypeProperty ;
+    rdfs:label "has step description" ;
+    rdfs:domain :ProofStep ;
+    rdfs:range xsd:string ;
+    rdfs:comment "A human-readable description of what the step does" .
+
+:hasStepResult a owl:ObjectProperty ;
+    rdfs:label "has step result" ;
+    rdfs:domain :ProofStep ;
+    rdfs:range :ResultSet ;
+    rdfs:comment "The intermediate result set produced by this step" . 

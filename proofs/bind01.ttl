@@ -1,0 +1,68 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sp: <http://www.w3.org/2005/sparql-results#> .
+@prefix : <#> .
+
+# The proof
+:proof a :Proof ;
+    :hasQuery :query ;
+    :hasResultSet :result_set ;
+    :hasStep :step1 .
+
+# The query
+:query a :Query ;
+    :hasQueryString """
+PREFIX : <http://example.org/> 
+
+SELECT ?z
+{
+  ?s ?p ?o .
+  BIND(?o+10 AS ?z)
+}
+""" .
+
+# The result set
+:result_set a :ResultSet ;
+    :hasResult :result1, :result2, :result3, :result4 .
+
+# Individual results
+:result1 a :Result ;
+    :hasBinding :binding1 .
+
+:result2 a :Result ;
+    :hasBinding :binding2 .
+
+:result3 a :Result ;
+    :hasBinding :binding3 .
+
+:result4 a :Result ;
+    :hasBinding :binding4 .
+
+# Bindings
+:binding1 a :Binding ;
+    :hasVariable "z" ;
+    :hasValue "14" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+:binding2 a :Binding ;
+    :hasVariable "z" ;
+    :hasValue "13" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+:binding3 a :Binding ;
+    :hasVariable "z" ;
+    :hasValue "12" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+:binding4 a :Binding ;
+    :hasVariable "z" ;
+    :hasValue "11" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+# The proof step
+:step1 a :ProofStep ;
+    :hasStepType "bind" ;
+    :hasStepDescription "BIND(?o+10 AS ?z)" ;
+    :hasStepResult :result_set . 

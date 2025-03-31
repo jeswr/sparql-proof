@@ -1,0 +1,131 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sp: <http://www.w3.org/2005/sparql-results#> .
+@prefix : <#> .
+
+# The proof
+:proof a :Proof ;
+    :hasQuery :query ;
+    :hasResultSet :result_set ;
+    :hasStep :step1 .
+
+# The query
+:query a :Query ;
+    :hasQueryString """
+PREFIX : <http://example.org/> 
+
+SELECT *
+{
+  ?s ?p ?o .
+  BIND(?nova AS ?z)
+}
+""" .
+
+# The result set
+:result_set a :ResultSet ;
+    :hasResult :result1, :result2, :result3, :result4 .
+
+# Individual results
+:result1 a :Result ;
+    :hasBinding :binding1_s, :binding1_p, :binding1_o, :binding1_z .
+
+:result2 a :Result ;
+    :hasBinding :binding2_s, :binding2_p, :binding2_o, :binding2_z .
+
+:result3 a :Result ;
+    :hasBinding :binding3_s, :binding3_p, :binding3_o, :binding3_z .
+
+:result4 a :Result ;
+    :hasBinding :binding4_s, :binding4_p, :binding4_o, :binding4_z .
+
+# Bindings for result1
+:binding1_s a :Binding ;
+    :hasVariable "s" ;
+    :hasValue "http://example.org/s4" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#anyURI> .
+
+:binding1_p a :Binding ;
+    :hasVariable "p" ;
+    :hasValue "http://example.org/p" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#anyURI> .
+
+:binding1_o a :Binding ;
+    :hasVariable "o" ;
+    :hasValue "4" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+:binding1_z a :Binding ;
+    :hasVariable "z" ;
+    :hasValue "4" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+# Bindings for result2
+:binding2_s a :Binding ;
+    :hasVariable "s" ;
+    :hasValue "http://example.org/s3" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#anyURI> .
+
+:binding2_p a :Binding ;
+    :hasVariable "p" ;
+    :hasValue "http://example.org/p" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#anyURI> .
+
+:binding2_o a :Binding ;
+    :hasVariable "o" ;
+    :hasValue "3" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+:binding2_z a :Binding ;
+    :hasVariable "z" ;
+    :hasValue "3" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+# Bindings for result3
+:binding3_s a :Binding ;
+    :hasVariable "s" ;
+    :hasValue "http://example.org/s2" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#anyURI> .
+
+:binding3_p a :Binding ;
+    :hasVariable "p" ;
+    :hasValue "http://example.org/p" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#anyURI> .
+
+:binding3_o a :Binding ;
+    :hasVariable "o" ;
+    :hasValue "2" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+:binding3_z a :Binding ;
+    :hasVariable "z" ;
+    :hasValue "2" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+# Bindings for result4
+:binding4_s a :Binding ;
+    :hasVariable "s" ;
+    :hasValue "http://example.org/s1" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#anyURI> .
+
+:binding4_p a :Binding ;
+    :hasVariable "p" ;
+    :hasValue "http://example.org/p" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#anyURI> .
+
+:binding4_o a :Binding ;
+    :hasVariable "o" ;
+    :hasValue "1" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+:binding4_z a :Binding ;
+    :hasVariable "z" ;
+    :hasValue "1" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+# The proof step
+:step1 a :ProofStep ;
+    :hasStepType "bind" ;
+    :hasStepDescription "BIND(?nova AS ?z)" ;
+    :hasStepResult :result_set . 

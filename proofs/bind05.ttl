@@ -1,0 +1,167 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sp: <http://www.w3.org/2005/sparql-results#> .
+@prefix : <#> .
+
+# The proof
+:proof a :Proof ;
+    :hasQuery :query ;
+    :hasResultSet :result_set ;
+    :hasStep :step1, :step2 .
+
+# The query
+:query a :Query ;
+    :hasQueryString """
+PREFIX : <http://example.org/> 
+
+SELECT ?s ?p ?o ?z
+{
+  ?s ?p ?o .
+  BIND(?o+1 AS ?z)
+  FILTER(?z = 3 )
+}
+""" .
+
+# The result set
+:result_set a :ResultSet ;
+    :hasResult :result1 .
+
+# Individual result
+:result1 a :Result ;
+    :hasBinding :binding1_s, :binding1_p, :binding1_o, :binding1_z .
+
+# Bindings for result1
+:binding1_s a :Binding ;
+    :hasVariable "s" ;
+    :hasValue "http://example.org/s2" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#anyURI> .
+
+:binding1_p a :Binding ;
+    :hasVariable "p" ;
+    :hasValue "http://example.org/p" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#anyURI> .
+
+:binding1_o a :Binding ;
+    :hasVariable "o" ;
+    :hasValue "2" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+:binding1_z a :Binding ;
+    :hasVariable "z" ;
+    :hasValue "3" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+# The proof steps
+:step1 a :ProofStep ;
+    :hasStepType "bind" ;
+    :hasStepDescription "BIND(?o+1 AS ?z)" ;
+    :hasStepResult :intermediate_result_set1 ;
+    :hasNextStep :step2 .
+
+:step2 a :ProofStep ;
+    :hasStepType "filter" ;
+    :hasStepDescription "FILTER(?z = 3)" ;
+    :hasStepResult :result_set .
+
+# Intermediate result set
+:intermediate_result_set1 a :ResultSet ;
+    :hasResult :intermediate_result1, :intermediate_result2, :intermediate_result3, :intermediate_result4 .
+
+# Intermediate results
+:intermediate_result1 a :Result ;
+    :hasBinding :intermediate_binding1_s, :intermediate_binding1_p, :intermediate_binding1_o, :intermediate_binding1_z .
+
+:intermediate_result2 a :Result ;
+    :hasBinding :intermediate_binding2_s, :intermediate_binding2_p, :intermediate_binding2_o, :intermediate_binding2_z .
+
+:intermediate_result3 a :Result ;
+    :hasBinding :intermediate_binding3_s, :intermediate_binding3_p, :intermediate_binding3_o, :intermediate_binding3_z .
+
+:intermediate_result4 a :Result ;
+    :hasBinding :intermediate_binding4_s, :intermediate_binding4_p, :intermediate_binding4_o, :intermediate_binding4_z .
+
+# Intermediate bindings for result1
+:intermediate_binding1_s a :Binding ;
+    :hasVariable "s" ;
+    :hasValue "http://example.org/s4" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#anyURI> .
+
+:intermediate_binding1_p a :Binding ;
+    :hasVariable "p" ;
+    :hasValue "http://example.org/p" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#anyURI> .
+
+:intermediate_binding1_o a :Binding ;
+    :hasVariable "o" ;
+    :hasValue "4" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+:intermediate_binding1_z a :Binding ;
+    :hasVariable "z" ;
+    :hasValue "5" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+# Intermediate bindings for result2
+:intermediate_binding2_s a :Binding ;
+    :hasVariable "s" ;
+    :hasValue "http://example.org/s3" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#anyURI> .
+
+:intermediate_binding2_p a :Binding ;
+    :hasVariable "p" ;
+    :hasValue "http://example.org/p" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#anyURI> .
+
+:intermediate_binding2_o a :Binding ;
+    :hasVariable "o" ;
+    :hasValue "3" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+:intermediate_binding2_z a :Binding ;
+    :hasVariable "z" ;
+    :hasValue "4" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+# Intermediate bindings for result3
+:intermediate_binding3_s a :Binding ;
+    :hasVariable "s" ;
+    :hasValue "http://example.org/s2" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#anyURI> .
+
+:intermediate_binding3_p a :Binding ;
+    :hasVariable "p" ;
+    :hasValue "http://example.org/p" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#anyURI> .
+
+:intermediate_binding3_o a :Binding ;
+    :hasVariable "o" ;
+    :hasValue "2" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+:intermediate_binding3_z a :Binding ;
+    :hasVariable "z" ;
+    :hasValue "3" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+# Intermediate bindings for result4
+:intermediate_binding4_s a :Binding ;
+    :hasVariable "s" ;
+    :hasValue "http://example.org/s1" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#anyURI> .
+
+:intermediate_binding4_p a :Binding ;
+    :hasVariable "p" ;
+    :hasValue "http://example.org/p" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#anyURI> .
+
+:intermediate_binding4_o a :Binding ;
+    :hasVariable "o" ;
+    :hasValue "1" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+:intermediate_binding4_z a :Binding ;
+    :hasVariable "z" ;
+    :hasValue "2" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> . 

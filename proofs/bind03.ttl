@@ -1,0 +1,98 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sp: <http://www.w3.org/2005/sparql-results#> .
+@prefix : <#> .
+
+# The proof
+:proof a :Proof ;
+    :hasQuery :query ;
+    :hasResultSet :result_set ;
+    :hasStep :step1, :step2 .
+
+# The query
+:query a :Query ;
+    :hasQueryString """
+PREFIX : <http://example.org/> 
+
+SELECT ?z ?s1
+{
+  ?s ?p ?o .
+  BIND(?o+1 AS ?z)
+  ?s1 ?p1 ?z
+}
+""" .
+
+# The result set
+:result_set a :ResultSet ;
+    :hasResult :result1, :result2, :result3 .
+
+# Individual results
+:result1 a :Result ;
+    :hasBinding :binding1_z, :binding1_s1 .
+
+:result2 a :Result ;
+    :hasBinding :binding2_z, :binding2_s1 .
+
+:result3 a :Result ;
+    :hasBinding :binding3_z, :binding3_s1 .
+
+# Bindings for result1
+:binding1_z a :Binding ;
+    :hasVariable "z" ;
+    :hasValue "4" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+:binding1_s1 a :Binding ;
+    :hasVariable "s1" ;
+    :hasValue "http://example.org/s4" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#anyURI> .
+
+# Bindings for result2
+:binding2_z a :Binding ;
+    :hasVariable "z" ;
+    :hasValue "3" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+:binding2_s1 a :Binding ;
+    :hasVariable "s1" ;
+    :hasValue "http://example.org/s3" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#anyURI> .
+
+# Bindings for result3
+:binding3_z a :Binding ;
+    :hasVariable "z" ;
+    :hasValue "2" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+:binding3_s1 a :Binding ;
+    :hasVariable "s1" ;
+    :hasValue "http://example.org/s2" ;
+    :hasDatatype <http://www.w3.org/2001/XMLSchema#anyURI> .
+
+# The proof steps
+:step1 a :ProofStep ;
+    :hasStepType "bind" ;
+    :hasStepDescription "BIND(?o+1 AS ?z)" ;
+    :hasStepResult :intermediate_result_set1 ;
+    :hasNextStep :step2 .
+
+:step2 a :ProofStep ;
+    :hasStepType "join" ;
+    :hasStepDescription "Join with ?s1 ?p1 ?z" ;
+    :hasStepResult :result_set .
+
+# Intermediate result set
+:intermediate_result_set1 a :ResultSet ;
+    :hasResult :intermediate_result1, :intermediate_result2, :intermediate_result3 .
+
+# Intermediate results
+:intermediate_result1 a :Result ;
+    :hasBinding :binding1_z .
+
+:intermediate_result2 a :Result ;
+    :hasBinding :binding2_z .
+
+:intermediate_result3 a :Result ;
+    :hasBinding :binding3_z . 
