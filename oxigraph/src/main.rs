@@ -136,23 +136,39 @@ fn to_extend(variables: &mut Vec<Variable>, first_triple: &spargebra::term::Trip
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     if args.len() < 2 {
-        eprintln!("Usage: {} <SPARQL query>", args[0]);
+        eprintln!("Usage: {} [-convert|-check] <SPARQL query>", args[0]);
         std::process::exit(1);
     }
-    let query_str = &args[1];
-    let mut query = Query::parse(query_str, None).unwrap();
-    if let Query::Select { dataset, pattern: GraphPattern::Project { inner, variables }, base_iri } = &mut query {
-      let new_pattern = extend_pattern(*inner.clone(), variables);
 
-      let q2 = Query::Select { 
-        dataset: dataset.clone(), 
-        pattern: GraphPattern::Project { 
-          inner: Box::new(new_pattern),
-          variables: variables.to_vec() 
-        }, 
-        base_iri: base_iri.clone() 
-      };
+    let flag = &args[1];
+    let query_str = &args[2];
+    
 
-      println!("{}", q2.to_string());
+    match flag.as_str() {
+        "-convert" => {
+            let mut query = Query::parse(query_str, None).unwrap();
+            if let Query::Select { dataset, pattern: GraphPattern::Project { inner, variables }, base_iri } = &mut query {
+                let new_pattern = extend_pattern(*inner.clone(), variables);
+
+                let q2 = Query::Select { 
+                    dataset: dataset.clone(), 
+                    pattern: GraphPattern::Project { 
+                        inner: Box::new(new_pattern),
+                        variables: variables.to_vec() 
+                    }, 
+                    base_iri: base_iri.clone() 
+                };
+
+                println!("{}", q2.to_string());
+            }
+        }
+        "-check" => {
+            let result = &args[3];
+            println!("{}", result);
+        }
+        _ => {
+            eprintln!("Invalid flag. Use -convert or -check");
+            std::process::exit(1);
+        }
     }
 }
