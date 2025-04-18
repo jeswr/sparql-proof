@@ -1,0 +1,171 @@
+# From https://ceur-ws.org/Vol-1644/paper12.pdf
+
+@prefix spa: <http://meta-sparql.org/vocab/spa#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sp: <http://spinrdf.org/sp#> .
+
+<http://meta-sparql.org/vocab/spa> a owl:Ontology ;
+  rdfs:label "RDF Syntax for SPARQL Algebra" ;
+  rdfs:comment "An RDF schema used to represent SPARQL Algebra as RDF." ;
+  owl:versionInfo "0.1.0" .
+
+spa:Op a owl:Class ;
+  rdfs:label "Generic Operation" .
+
+spa:subOp a owl:ObjectProperty ;
+  rdfs:label "Generic Suboperation" ;
+  rdfs:range spa:Op ;
+  rdfs:domain spa:Op .
+
+spa:leftOp rdfs:label "Left Suboperation" ;
+  rdfs:domain spa:Op2 ;
+  owl:subPropertyOf spa:subOp .
+
+spa:Op2 rdfs:label "Operation with Arity 2" ;
+  owl:subClassOf spa:Op .
+
+spa:rightOp rdfs:label "Right Suboperation" ;
+  rdfs:domain spa:Op2 ;
+  owl:subPropertyOf spa:subOp .
+
+spa:Op0 rdfs:label "Operation with Arity 0" ;
+  owl:subClassOf spa:Op .
+
+spa:Table rdfs:label "Table" ;
+  owl:subClassOf spa:Op0 .
+
+spa:BGP rdfs:label "Basic Graph Pattern" ;
+  owl:subClassOf spa:Op0 .
+
+spa:tuple rdfs:label "Triple Path or Triple Pattern" ;
+  rdfs:range sp:Tuple ;
+  rdfs:domain spa:BGP .
+
+spa:Op1 rdfs:label "Operation with Arity 1" ;
+  owl:subClassOf spa:Op .
+
+spa:Project rdfs:label "Project" ;
+  owl:subClassOf spa:Op1 .
+
+spa:projectedVariable rdfs:label "Projected Variable" ;
+  rdfs:domain spa:Project .
+
+spa:Aggregation rdfs:label "Aggregation" ;
+  owl:subClassOf spa:Op1 .
+
+spa:aggrExprList rdfs:label "Expression List for Aggregation" ;
+  rdfs:range <rdf:List> ;
+  rdfs:domain spa:Aggregation .
+
+spa:aggrSetFunction rdfs:label "Set Function for Aggregation" ;
+  rdfs:domain spa:Aggregation .
+
+spa:aggrScalar rdfs:label "Scalar for Aggregation" ;
+  rdfs:range spa:Scalar ;
+  rdfs:domain spa:Aggregation .
+
+spa:Scalar a owl:Class ;
+  rdfs:label "Scalar for Aggregation" .
+
+spa:scalarName rdfs:label "Scalar Name" ;
+  rdfs:range <http://www.w3.org/2001/XMLSchema#string> ;
+  rdfs:domain spa:Scalar .
+
+spa:scalarValue rdfs:label "Scalar Value" ;
+  rdfs:range <http://www.w3.org/2001/XMLSchema#string> ;
+  rdfs:domain spa:Scalar .
+
+spa:Distinct rdfs:label "Distinct" ;
+  owl:subClassOf spa:Op1 .
+
+spa:Extend rdfs:label "Extend" ;
+  owl:subClassOf spa:Op1 .
+
+spa:bind rdfs:label "Bind introduced in Extend" ;
+  rdfs:range sp:Bind ;
+  rdfs:domain spa:Extend .
+
+spa:Filter rdfs:label "Filter" ;
+  owl:subClassOf spa:Op1 .
+
+spa:expr rdfs:label "Expression for Filter" ;
+  rdfs:domain spa:Filter .
+
+spa:Graph rdfs:label "Graph" ;
+  owl:subClassOf spa:Op1 .
+
+spa:graphSource rdfs:label "Graph Source" ;
+  rdfs:range spa:GraphSource ;
+  rdfs:domain spa:Graph .
+
+spa:GraphSource a owl:Class ;
+  rdfs:label "Graph Source" .
+
+spa:NamedGraphSource rdfs:label "Named Graph Source" ;
+  owl:subClassOf spa:GraphSource .
+
+spa:graphName rdfs:label "Name of the Graph" ;
+  rdfs:range <http://www.w3.org/2001/XMLSchema#anyURI> ;
+  rdfs:domain spa:NamedGraphSource .
+
+spa:GraphUnion rdfs:label "Graph Union" ;
+  owl:subClassOf spa:GraphSource .
+
+spa:fromGraphSource rdfs:label "Graph Source for Union" ;
+  rdfs:range spa:GraphSource ;
+  rdfs:domain spa:GraphUnion .
+
+spa:Construct rdfs:label "CONSTRUCT Query" ;
+  owl:subClassOf spa:GraphSource .
+
+spa:templateTriple rdfs:label "Construct Template Triple" ;
+  rdfs:range sp:Triple ;
+  rdfs:domain spa:Construct .
+
+spa:Group rdfs:label "Group" ;
+  owl:subClassOf spa:Op1 .
+
+spa:groupExpression rdfs:label "Group Expression" ;
+  rdfs:domain spa:Group .
+
+spa:OrderBy rdfs:label "OrderBy" ;
+  owl:subClassOf spa:Op1 .
+
+spa:orderByConditions rdfs:label "List of OrderBy Conditions" ;
+  rdfs:range <rdf:List> ;
+  rdfs:domain spa:OrderBy .
+
+spa:Reduced rdfs:label "Reduced" ;
+  owl:subClassOf spa:Op1 .
+
+spa:Slice rdfs:label "Slice" ;
+  owl:subClassOf spa:Op1 .
+
+spa:sliceLength rdfs:label "Length of Slice" ;
+  rdfs:range <http://www.w3.org/2001/XMLSchema#integer> ;
+  rdfs:domain spa:Slice .
+
+spa:sliceStart rdfs:label "Start of Slice" ;
+  rdfs:range <http://www.w3.org/2001/XMLSchema#integer> ;
+  rdfs:domain spa:Slice .
+
+spa:ToList rdfs:label "ToList" ;
+  owl:subClassOf spa:Op1 .
+
+spa:ToMultiSet rdfs:label "ToMultiSet" ;
+  owl:subClassOf spa:Op1 .
+
+spa:LeftJoin owl:subClassOf spa:Op2 .
+
+spa:Minus owl:subClassOf spa:Op2 .
+
+spa:OpN rdfs:label "Operation with Arity N" ;
+  owl:subClassOf spa:Op .
+
+spa:Union owl:subClassOf spa:OpN .
+
+spa:AggregateJoin owl:subClassOf spa:OpN .
+
+spa:Join owl:subClassOf spa:OpN .
