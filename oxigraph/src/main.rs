@@ -155,5 +155,4 @@ fn main() {
 
       println!("{}", q2.to_string());
     }
-    // println!("{}", query.to_string());
 }

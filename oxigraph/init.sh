@@ -9,12 +9,12 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-time {
-  query=$1
-  output=$("$SCRIPT_DIR/target/release/sparconvert" "$query")
-  echo "$output"
-  oxigraph load --location .oxigraph-store --file test.ttl
-  # # oxigraph query --location .oxigraph-store --query "SELECT ?s ?p ?o WHERE { ?s ?p ?o }" --results-format json | jq
-  oxigraph query --location .oxigraph-store --query "$output" --results-format json | jq
-  rm -rf .oxigraph-store
-}
+query=$1
+output=$("$SCRIPT_DIR/target/release/sparconvert" "$query")
+# echo "$output"
+oxigraph load --location .oxigraph-store --file test.ttl
+# # oxigraph query --location .oxigraph-store --query "SELECT ?s ?p ?o WHERE { ?s ?p ?o }" --results-format json | jq
+result=$(oxigraph query --location .oxigraph-store --query "$output" --results-format json)
+
+# echo "$result"
+# rm -rf .oxigraph-store
