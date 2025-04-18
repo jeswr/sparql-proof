@@ -1,0 +1,7 @@
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX ex: <http://example.com/>
+
+SELECT ?s ?o WHERE {
+  ?s foaf:knows/foaf:name ?o ;
+    a ex:Person 
+}

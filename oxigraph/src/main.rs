@@ -1,53 +1,63 @@
-use spargebra::{algebra::{self, GraphPattern}, term::{TermPattern, Variable, NamedNodePattern}, Query};
+use spargebra::{algebra::{self, GraphPattern, PropertyPathExpression}, term::{NamedNodePattern, TermPattern, TriplePattern, Variable}, Query};
 use uuid::Uuid;
 
 fn generate_variable() -> String {
   "v".to_owned() + &Uuid::new_v4().to_string().replace("-", "")
 }
 
-fn extend_pattern(pattern: GraphPattern, variables: &mut Vec<Variable>) -> GraphPattern {
-  match pattern {
-    GraphPattern::Bgp { patterns } => {
+fn path_to_bgp(subject: TermPattern, path: PropertyPathExpression, object: TermPattern) -> GraphPattern {
+  match path {
+    PropertyPathExpression::NamedNode(n) => {
+      GraphPattern::Bgp { patterns: vec![TriplePattern { subject, predicate: NamedNodePattern::NamedNode(n), object }] }
+    }
+    PropertyPathExpression::Reverse(p) => {
+      path_to_bgp(object, *p, subject)
+    }
+    PropertyPathExpression::Sequence(p1, p2) => {
+      // println!("sequence");
       let variable = Variable::new(generate_variable()).unwrap();
-      variables.push(variable.clone());
-      
-      // Get the first triple pattern from the BGP
-      let first_triple   = patterns.first().unwrap();
-      
-      GraphPattern::Extend {
-          inner: Box::new(GraphPattern::Bgp { patterns: patterns.clone() }), 
-          variable: variable.clone(), 
-          expression: algebra::Expression::FunctionCall(
-              algebra::Function::Triple,
-              vec![
-                  match &first_triple.subject {
-                      TermPattern::Variable(v) => algebra::Expression::Variable(v.clone()),
-                      TermPattern::NamedNode(n) => algebra::Expression::NamedNode(n.clone()),
-                      TermPattern::Literal(l) => algebra::Expression::Literal(l.clone()),
-                      _ => panic!("Unsupported term pattern in subject position"),
-                  },
-                  match &first_triple.predicate {
-                    NamedNodePattern::Variable(v) => algebra::Expression::Variable(v.clone()),
-                    NamedNodePattern::NamedNode(n) => algebra::Expression::NamedNode(n.clone()),
-                },
-                  match &first_triple.object {
-                      TermPattern::Variable(v) => algebra::Expression::Variable(v.clone()),
-                      TermPattern::NamedNode(n) => algebra::Expression::NamedNode(n.clone()),
-                      TermPattern::Literal(l) => algebra::Expression::Literal(l.clone()),
-                      _ => panic!("Unsupported term pattern in object position"),
-                  }
-              ]
-          ),
-      }
+      let bgp1 = path_to_bgp(subject, *p1, spargebra::term::TermPattern::Variable(variable.clone()));
+      let bgp2 = path_to_bgp(spargebra::term::TermPattern::Variable(variable), *p2, object);
+      GraphPattern::Join { left: Box::new(bgp1), right: Box::new(bgp2) }
+    }
+    PropertyPathExpression::Alternative(p1, p2) => {
+      let variable = Variable::new(generate_variable()).unwrap();
+      let bgp1 = path_to_bgp(subject, *p1, spargebra::term::TermPattern::Variable(variable.clone()));
+      let bgp2 = path_to_bgp(spargebra::term::TermPattern::Variable(variable), *p2, object);
+      GraphPattern::Union { left: Box::new(bgp1), right: Box::new(bgp2) }
+    }
+    _ => panic!("Unsupported path expression"),
+  }
+}
+
+fn extend_pattern(pattern: GraphPattern, variables: &mut Vec<Variable>) -> GraphPattern {
+  // println!("extend_pattern");
+  match pattern {
+    GraphPattern::Bgp { patterns } => { 
+      // println!("bgp");
+      convert_bgp(variables, patterns)
     },
-    GraphPattern::Path { subject, path, object } => todo!("path"),
-    GraphPattern::Join { left, right } => todo!("join"),
+    GraphPattern::Path { subject, path, object } => {
+      // println!("path");
+      extend_pattern(path_to_bgp(subject, path, object), variables)
+    },
+    GraphPattern::Join { left, right } => {
+      // println!("join");
+      let mut left = extend_pattern(*left, variables);
+      let mut right = extend_pattern(*right, variables);
+      GraphPattern::Join { left: Box::new(left), right: Box::new(right) }
+    },
     GraphPattern::LeftJoin { left, right, expression } => todo!("left join"),
     GraphPattern::Filter { expr, inner } => todo!("filter"),
-    GraphPattern::Union { left, right } => todo!("union"),
+    GraphPattern::Union { left, right } => {
+      println!("union");
+      let mut left = extend_pattern(*left, variables);
+      let mut right = extend_pattern(*right, variables);
+      GraphPattern::Union { left: Box::new(left), right: Box::new(right) }
+    },
     GraphPattern::Graph { name, inner } => todo!("graph"),
     GraphPattern::Extend { inner, variable, expression } => {
-      println!("extend");
+      // println!("extend");
       GraphPattern::Extend { inner, variable, expression }
     },
     GraphPattern::Minus { left, right } => todo!("minus"),
@@ -57,9 +67,70 @@ fn extend_pattern(pattern: GraphPattern, variables: &mut Vec<Variable>) -> Graph
     GraphPattern::Distinct { inner } => todo!("distinct"),
     GraphPattern::Reduced { inner } => todo!("reduced"),
     GraphPattern::Slice { inner, start, length } => todo!("slice"),
-    GraphPattern::Group { inner, variables, aggregates } => todo!("group"),
+    GraphPattern::Group { inner, variables: ivariables, aggregates } => {
+      // println!("group");
+      let mut inner = extend_pattern(*inner, variables);
+      GraphPattern::Group { inner: Box::new(inner), variables: ivariables, aggregates }
+      
+    },
     GraphPattern::Service { name, inner, silent } => todo!("service"),
   }
+}
+
+fn convert_bgp(variables: &mut Vec<Variable>, patterns: Vec<spargebra::term::TriplePattern>) -> GraphPattern {
+    // Get the first triple pattern from the BGP
+    let first_triple   = patterns.first().unwrap();
+      
+    let mut result = to_extend(variables, first_triple);
+
+    for pattern in patterns.iter().skip(1) {
+        let left = result.clone();
+        let right = to_extend(variables, pattern);
+        result = GraphPattern::Join { left: Box::new(left), right: Box::new(right) };
+      }
+
+    result
+}
+
+fn to_extend(variables: &mut Vec<Variable>, first_triple: &spargebra::term::TriplePattern) -> GraphPattern {
+    let variable = Variable::new(generate_variable()).unwrap();
+    variables.push(variable.clone());
+
+    let TriplePattern { mut subject, predicate, mut object } = first_triple.clone();
+    if let TermPattern::BlankNode(b) = subject {
+      subject = TermPattern::Variable(Variable::new(generate_variable()).unwrap());
+    }
+    if let TermPattern::BlankNode(b) = object {
+      object = TermPattern::Variable(Variable::new(generate_variable()).unwrap());
+    }
+
+    GraphPattern::Extend {
+          inner: Box::new(GraphPattern::Bgp { patterns: vec![TriplePattern { subject: subject.clone(), predicate: predicate.clone(), object: object.clone() }] }), 
+          variable: variable.clone(), 
+          expression: algebra::Expression::FunctionCall(
+              algebra::Function::Triple,
+              vec![
+                  match subject {
+                      TermPattern::Variable(v) => algebra::Expression::Variable(v.clone()),
+                      TermPattern::NamedNode(n) => algebra::Expression::NamedNode(n.clone()),
+                      TermPattern::Literal(l) => algebra::Expression::Literal(l.clone()),
+                      TermPattern::BlankNode(_) => panic!("Blank node in subject position"),
+                      TermPattern::Triple(_) => panic!("Triple in subject position"),
+                  },
+                  match predicate {
+                    NamedNodePattern::Variable(v) => algebra::Expression::Variable(v.clone()),
+                    NamedNodePattern::NamedNode(n) => algebra::Expression::NamedNode(n.clone()),
+                  },
+                  match object {
+                      TermPattern::Variable(v) => algebra::Expression::Variable(v.clone()),
+                      TermPattern::NamedNode(n) => algebra::Expression::NamedNode(n.clone()),
+                      TermPattern::Literal(l) => algebra::Expression::Literal(l.clone()),
+                      TermPattern::BlankNode(_) => panic!("Blank node in object position"),
+                      TermPattern::Triple(t) => panic!("Triple in object position"),
+                  }
+              ]
+          ),
+      }
 }
 
 fn main() {

@@ -4,9 +4,24 @@
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix sp: <http://spinrdf.org/sp#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
 <http://meta-sparql.org/vocab/spa> a owl:Ontology ;
   # rdfs:label "RDF Syntax for SPARQL Algebra" ;
   # rdfs:comment "An RDF schema used to represent SPARQL Algebra as RDF." ;
   rdfs:states <<owl:Ontology rdf:type owl:Ontology>> ;
   owl:versionInfo "0.1.0" .
+
+<http://example.com/Person> a owl:Class ;
+  rdfs:label "Person" ;
+  rdfs:comment "A person." ;
+  owl:versionInfo "0.1.0" .
+
+<http://example.org/Jesse> a <http://example.com/Person> ;
+  foaf:age 30 ;
+  foaf:knows <http://example.org/Bob> ;
+  foaf:name "Jesse" .
+
+<http://example.org/Bob> a <http://example.com/Person> ;
+  foaf:age 30 ;
+  foaf:name "Bob" .
