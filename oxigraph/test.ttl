@@ -1,0 +1,12 @@
+
+@prefix spa: <http://meta-sparql.org/vocab/spa#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sp: <http://spinrdf.org/sp#> .
+
+<http://meta-sparql.org/vocab/spa> a owl:Ontology ;
+  # rdfs:label "RDF Syntax for SPARQL Algebra" ;
+  # rdfs:comment "An RDF schema used to represent SPARQL Algebra as RDF." ;
+  rdfs:states <<owl:Ontology rdf:type owl:Ontology>> ;
+  owl:versionInfo "0.1.0" .
