@@ -36,3 +36,6 @@ Given that we can do V1 just using query re-writing to ensure that we pull out:
 
 - The source facts given to the SPARQL query
 - The the provenance if necessary
+
+
+One nice way of doing this with the existing SPARQL API is to say "this here is a proof that this is generated from the following hash of triples"

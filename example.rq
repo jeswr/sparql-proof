@@ -1,0 +1,19 @@
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX owl:  <http://www.w3.org/2002/07/owl#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX sioc: <http://rdfs.org/sioc/ns#>
+PREFIX :     <http://example.com/> .
+
+SELECT ?person WHERE {
+  # Sort of similar to prov:Activity but not quite ...
+  [] a :Activity ;
+    :issuer ?issuer ;
+    :validFrom ?validFrom ;
+    :endTime ?endTime ;
+    :label ?label ;
+    rdfs:states <<?person a foaf:Person>>, <<?person foaf:age ?age>> .
+
+  FILTER(?age > 21)
+}

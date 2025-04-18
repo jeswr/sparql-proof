@@ -1,2 +1,4 @@
 node_modules
 oxigraph/target
+.oxigraph-store
+oxigraph/.oxigraph-store

@@ -3,14 +3,8 @@
 # Get the directory where the script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-# Check if query file argument is provided
-if [ -z "$1" ]; then
-    echo "Error: Please provide a query file path as the first argument"
-    exit 1
-fi
-
 time {
-  query=$1
+  query=$(cat query.rq)
   output=$("$SCRIPT_DIR/target/release/sparconvert" "$query")
   echo "$output"
   oxigraph load --location .oxigraph-store --file test.ttl
