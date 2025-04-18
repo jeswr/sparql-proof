@@ -1,4 +1,4 @@
-use spargebra::{algebra::{self, GraphPattern}, term::{TermPattern, TriplePattern, Variable, NamedNodePattern}, Query};
+use spargebra::{algebra::{self, GraphPattern}, term::{TermPattern, Variable, NamedNodePattern}, Query};
 use uuid::Uuid;
 
 fn generate_variable() -> String {
@@ -7,14 +7,14 @@ fn generate_variable() -> String {
 
 fn extend_pattern(pattern: GraphPattern, variables: &mut Vec<Variable>) -> GraphPattern {
   match pattern {
-    GraphPattern::Bgp { mut patterns } => {
+    GraphPattern::Bgp { patterns } => {
       let variable = Variable::new(generate_variable()).unwrap();
       variables.push(variable.clone());
       
       // Get the first triple pattern from the BGP
       let first_triple   = patterns.first().unwrap();
       
-      GraphPattern::Extend { 
+      GraphPattern::Extend {
           inner: Box::new(GraphPattern::Bgp { patterns: patterns.clone() }), 
           variable: variable.clone(), 
           expression: algebra::Expression::FunctionCall(
@@ -63,7 +63,12 @@ fn extend_pattern(pattern: GraphPattern, variables: &mut Vec<Variable>) -> Graph
 }
 
 fn main() {
-    let query_str = "SELECT ?s ?p ?o WHERE { ?s ?p ?o }";
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() < 2 {
+        eprintln!("Usage: {} <SPARQL query>", args[0]);
+        std::process::exit(1);
+    }
+    let query_str = &args[1];
     let mut query = Query::parse(query_str, None).unwrap();
     if let Query::Select { dataset, pattern: GraphPattern::Project { inner, variables }, base_iri } = &mut query {
       let new_pattern = extend_pattern(*inner.clone(), variables);
