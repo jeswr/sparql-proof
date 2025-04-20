@@ -10,8 +10,9 @@ if [ -z "$1" ]; then
 fi
 
 query=$1
+# echo "Query: $query"
 output=$("$SCRIPT_DIR/target/release/sparconvert" -convert "$query")
-# echo "$output"
+# echo "Converted query: $output"
 oxigraph load --location .oxigraph-store --file "$SCRIPT_DIR/test.ttl"
 # # oxigraph query --location .oxigraph-store --query "SELECT ?s ?p ?o WHERE { ?s ?p ?o }" --results-format json | jq
 result=$(oxigraph query --location .oxigraph-store --query "$output" --results-format json)

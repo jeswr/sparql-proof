@@ -164,7 +164,15 @@ fn main() {
         }
         "-check" => {
             let result = &args[3];
-            println!("{}", result);
+            use std::collections::HashMap;
+
+            let result_json = serde_json::from_str::<serde_json::Value>(result).unwrap();
+            let result_json = result_json.get("results").unwrap().get("bindings").unwrap().as_array().unwrap();
+            let result_json = result_json.iter().map(|binding| {
+                binding.as_object().unwrap().iter().map(|(key, value)| (key.to_string(), value.to_string())).collect::<HashMap<String, String>>()
+            }).collect::<Vec<HashMap<String, String>>>();
+
+            println!("{:?}", result_json);
         }
         _ => {
             eprintln!("Invalid flag. Use -convert or -check");
