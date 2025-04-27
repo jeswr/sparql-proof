@@ -14,7 +14,6 @@ fn path_to_bgp(subject: TermPattern, path: PropertyPathExpression, object: TermP
       path_to_bgp(object, *p, subject)
     }
     PropertyPathExpression::Sequence(p1, p2) => {
-      // println!("sequence");
       let variable = Variable::new(generate_variable()).unwrap();
       let bgp1 = path_to_bgp(subject, *p1, spargebra::term::TermPattern::Variable(variable.clone()));
       let bgp2 = path_to_bgp(spargebra::term::TermPattern::Variable(variable), *p2, object);
@@ -30,7 +29,7 @@ fn path_to_bgp(subject: TermPattern, path: PropertyPathExpression, object: TermP
   }
 }
 
-fn extend_pattern(pattern: GraphPattern, variables: &mut Vec<Variable>) -> GraphPattern {
+fn extend_pattern(pattern: GraphPattern, variables: &mut Vec<Variable>, by_field: bool) -> GraphPattern {
   // println!("extend_pattern");
   match pattern {
     GraphPattern::Bgp { patterns } => { 
@@ -39,20 +38,29 @@ fn extend_pattern(pattern: GraphPattern, variables: &mut Vec<Variable>) -> Graph
     },
     GraphPattern::Path { subject, path, object } => {
       // println!("path");
-      extend_pattern(path_to_bgp(subject, path, object), variables)
+      extend_pattern(path_to_bgp(subject, path, object), variables, by_field)
     },
     GraphPattern::Join { left, right } => {
       // println!("join");
-      let mut left = extend_pattern(*left, variables);
-      let mut right = extend_pattern(*right, variables);
+      let left = extend_pattern(*left, variables, by_field);
+      let right = extend_pattern(*right, variables, by_field);
       GraphPattern::Join { left: Box::new(left), right: Box::new(right) }
     },
-    GraphPattern::LeftJoin { left, right, expression } => todo!("left join"),
-    GraphPattern::Filter { expr, inner } => todo!("filter"),
+    GraphPattern::LeftJoin { left, right, expression } => {
+      let left = extend_pattern(*left, variables, by_field);
+      let right = extend_pattern(*right, variables, by_field);
+      GraphPattern::LeftJoin { left: Box::new(left), right: Box::new(right), expression }
+    },
+    GraphPattern::Filter { expr, inner } => {
+      if (by_field) {
+        return GraphPattern::Filter { expr: expr, inner: inner }
+      }
+
+      todo!("orderby")
+    },
     GraphPattern::Union { left, right } => {
-      println!("union");
-      let mut left = extend_pattern(*left, variables);
-      let mut right = extend_pattern(*right, variables);
+      let left = extend_pattern(*left, variables, by_field);
+      let right = extend_pattern(*right, variables, by_field);
       GraphPattern::Union { left: Box::new(left), right: Box::new(right) }
     },
     GraphPattern::Graph { name, inner } => todo!("graph"),
@@ -61,15 +69,39 @@ fn extend_pattern(pattern: GraphPattern, variables: &mut Vec<Variable>) -> Graph
       GraphPattern::Extend { inner, variable, expression }
     },
     GraphPattern::Minus { left, right } => todo!("minus"),
-    GraphPattern::Values { variables, bindings } => todo!("values"),
-    GraphPattern::OrderBy { inner, expression } => todo!("order by"),
+    GraphPattern::Values { variables, bindings } => {
+      // TODO: See if we can use an existing library to convert the values into unions
+
+
+      todo!("values")
+    },
+    GraphPattern::OrderBy { inner, expression } => {
+      if (by_field) {
+        return GraphPattern::OrderBy { inner: inner, expression: expression }
+      }
+
+      todo!("orderby")
+    },
     GraphPattern::Project { inner, variables } => todo!("project"),
-    GraphPattern::Distinct { inner } => todo!("distinct"),
+    // TO IMPLEMENT THIS 
+    GraphPattern::Distinct { inner } => {
+      if (by_field) {
+        return GraphPattern::Distinct { inner: inner }
+      }
+
+      todo!("slide")
+    },
     GraphPattern::Reduced { inner } => todo!("reduced"),
-    GraphPattern::Slice { inner, start, length } => todo!("slice"),
+    GraphPattern::Slice { inner, start, length } => {
+      if (by_field) {
+        return GraphPattern::Slice { inner: inner, start: start, length: length }
+      }
+
+      todo!("slide")
+    },
     GraphPattern::Group { inner, variables: ivariables, aggregates } => {
       // println!("group");
-      let mut inner = extend_pattern(*inner, variables);
+      let inner = extend_pattern(*inner, variables, by_field);
       GraphPattern::Group { inner: Box::new(inner), variables: ivariables, aggregates }
       
     },
@@ -148,7 +180,7 @@ fn main() {
         "-convert" => {
             let mut query = Query::parse(query_str, None).unwrap();
             if let Query::Select { dataset, pattern: GraphPattern::Project { inner, variables }, base_iri } = &mut query {
-                let new_pattern = extend_pattern(*inner.clone(), variables);
+                let new_pattern = extend_pattern(*inner.clone(), variables, true);
 
                 let q2 = Query::Select { 
                     dataset: dataset.clone(), 

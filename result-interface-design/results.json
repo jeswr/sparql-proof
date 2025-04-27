@@ -1,0 +1,50 @@
+{
+  "head": {
+    "vars": [
+      "o",
+      "s",
+      "!"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "o": {
+          "type": "uri",
+          "value": "http://www.w3.org/2002/07/owl#Class"
+        },
+        "s": {
+          "type": "uri",
+          "value": "http://example.com/Person"
+        },
+        "!proof": {
+          "type": "ProofObject",
+          "value": {
+            "derivationProof": {
+              "type": "RiscZero-verification",
+              "programId": "24;oitn[q934j[t0qmgmergbnqn23r8pwergqwoeFINa",
+              "proof": "IUOiubIOUBioubIUOB...jQCrfFPP2oumHKtz"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "!sources": [{
+    "type": "DataIntegrityProof",
+    "cryptosuite": "eddsa-rdfc-2022",
+    "created": "2021-11-13T18:19:39Z",
+    "verificationMethod": "https://university.example/issuers/14#key-1",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "IUOiubIOUBioubIUOB...jQCrfFPP2oumHKtz"
+  }, {
+    "type": "DataIntegrityProof",
+    "cryptosuite": "eddsa-rdfc-2022",
+    "created": "2021-11-13T18:19:39Z",
+    "verificationMethod": "https://bank.example/issuers/14#key-1",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "IUOiubIOUBioubIUOB...jQCrfFPP2oumHKtz"
+  }]
+}
+
+
